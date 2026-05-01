@@ -7,6 +7,7 @@ import BottomTabBar from './components/layout/BottomTabBar'
 import Toast from './components/shared/Toast'
 import ConfirmModal from './components/shared/ConfirmModal'
 import ContextMenu from './components/shared/ContextMenu'
+import OnboardingOverlay from './components/shared/OnboardingOverlay'
 import ChatListPage from './components/chat/ChatListPage'
 import ChatDetailPage from './components/chat/ChatDetailPage'
 import CharacterListPage from './components/character/CharacterListPage'
@@ -24,24 +25,27 @@ export default function App() {
   useEffect(() => { themeInit(); apiInit(); charInit(); }, [themeInit, apiInit, charInit])
 
   return (
-    <div className="phone-frame">
-      <Routes>
-        <Route path="/" element={<Navigate to="/chat" replace />} />
-        <Route path="/chat" element={<ChatListPage />} />
-        <Route path="/chat/:characterId" element={<ChatDetailPage />} />
-        <Route path="/characters" element={<CharacterListPage />} />
-        <Route path="/characters/new" element={<CharacterEditPage />} />
-        <Route path="/characters/:id/edit" element={<CharacterEditPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/settings/api" element={<ApiListPage />} />
-        <Route path="/settings/api/new" element={<ApiEditPage />} />
-        <Route path="/settings/api/:id/edit" element={<ApiEditPage />} />
-        <Route path="/settings/theme" element={<ThemePage />} />
-      </Routes>
+    <>
+      <OnboardingOverlay />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/chat" replace />} />
+          <Route path="/chat" element={<ChatListPage />} />
+          <Route path="/chat/:characterId" element={<ChatDetailPage />} />
+          <Route path="/characters" element={<CharacterListPage />} />
+          <Route path="/characters/new" element={<CharacterEditPage />} />
+          <Route path="/characters/:id/edit" element={<CharacterEditPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings/api" element={<ApiListPage />} />
+          <Route path="/settings/api/new" element={<ApiEditPage />} />
+          <Route path="/settings/api/:id/edit" element={<ApiEditPage />} />
+          <Route path="/settings/theme" element={<ThemePage />} />
+        </Routes>
+      </div>
       <BottomTabBar />
       <Toast />
       <ConfirmModal />
       <ContextMenu />
-    </div>
+    </>
   )
 }
