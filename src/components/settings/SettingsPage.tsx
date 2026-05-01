@@ -49,7 +49,7 @@ export default function SettingsPage() {
         <Section label="API"><Row label="API 配置" value={apis.length ? `${apis.length} 组配置` : '未配置'} onClick={() => navigate('/settings/api')} /></Section>
         <Section label="外观"><Row label="主题" value={THEME_NAMES[theme] || '默认蓝'} onClick={() => navigate('/settings/theme')} /></Section>
         <Section label="数据"><Row label="导出备份" onClick={handleExport} /><Row label="重置所有数据" danger onClick={handleReset} /></Section>
-        <Section label="关于"><Row label="版本" value="IDchat v1.0.0" /></Section>
+        <Section label="关于"><Row label="版本" value="IDchat v1.0.6" /></Section>
       </div>
     </>
   )
