@@ -232,12 +232,12 @@ export default function ChatDetailPage() {
         </>}
       />
       {searchVisible && (
-        <div className="flex items-center gap-2 px-3 py-2 border-b flex-shrink-0" style={{ background: 'var(--surface)', borderColor: 'var(--divider)' }}>
-          <input value={searchQ} onChange={(e) => handleSearch(e.target.value)} placeholder="搜索对话..." className="flex-1 rounded-lg px-3 py-2 text-sm outline-none border-none" style={{ background: 'var(--input-bg)', color: 'var(--text)' }} autoFocus />
-          <span className="text-xs whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{searchResults.length ? `${searchIdx + 1}/${searchResults.length}` : searchQ ? '无结果' : ''}</span>
-          <button onClick={() => { if (searchIdx > 0) { const i = searchIdx - 1; setSearchIdx(i); scrollToMsg(searchResults[i]) } }} className="w-9 h-9 rounded-full border-none cursor-pointer text-base flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ background: 'var(--input-bg)', color: 'var(--text)' }}>↑</button>
-          <button onClick={() => { if (searchIdx < searchResults.length - 1) { const i = searchIdx + 1; setSearchIdx(i); scrollToMsg(searchResults[i]) } }} className="w-9 h-9 rounded-full border-none cursor-pointer text-base flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ background: 'var(--input-bg)', color: 'var(--text)' }}>↓</button>
-          <button onClick={() => { setSearchVisible(false); setSearchQ(''); setSearchResults([]); setSearchIdx(-1) }} className="w-9 h-9 rounded-full border-none cursor-pointer text-lg flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>✕</button>
+        <div className="flex items-center gap-2.5 px-3 py-2 border-b flex-shrink-0" style={{ background: 'var(--surface)', borderColor: 'var(--divider)' }}>
+          <input value={searchQ} onChange={(e) => handleSearch(e.target.value)} placeholder="搜索对话..." className="flex-1 rounded-lg px-3 py-2.5 text-sm outline-none border-none" style={{ background: 'var(--input-bg)', color: 'var(--text)' }} autoFocus />
+          <span className="text-xs whitespace-nowrap min-w-[40px] text-center" style={{ color: 'var(--text-secondary)' }}>{searchResults.length ? `${searchIdx + 1}/${searchResults.length}` : searchQ ? '无结果' : ''}</span>
+          <button onClick={() => { if (searchIdx > 0) { const i = searchIdx - 1; setSearchIdx(i); scrollToMsg(searchResults[i]) } }} className="w-[42px] h-[42px] rounded-full border-none cursor-pointer text-lg flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ background: 'var(--input-bg)', color: 'var(--text)' }} title="上一个">↑</button>
+          <button onClick={() => { if (searchIdx < searchResults.length - 1) { const i = searchIdx + 1; setSearchIdx(i); scrollToMsg(searchResults[i]) } }} className="w-[42px] h-[42px] rounded-full border-none cursor-pointer text-lg flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ background: 'var(--input-bg)', color: 'var(--text)' }} title="下一个">↓</button>
+          <button onClick={() => { setSearchVisible(false); setSearchQ(''); setSearchResults([]); setSearchIdx(-1) }} className="w-[42px] h-[42px] rounded-full border-none cursor-pointer text-xl flex items-center justify-center active:opacity-70 flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>✕</button>
         </div>
       )}
 

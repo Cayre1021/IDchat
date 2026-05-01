@@ -55,12 +55,13 @@ body {
   letter-spacing: -0.2px;
   margin: 0;
   padding: 0;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   transition: background-color .3s, color .3s;
