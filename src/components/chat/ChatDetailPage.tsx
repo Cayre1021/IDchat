@@ -32,7 +32,6 @@ export default function ChatDetailPage() {
   const char = chars.find((c) => c.id === characterId)
   const [msgs, setMsgs] = useState<Message[]>([])
   const [showEmoji, setShowEmoji] = useState(false)
-  const [emojiText, setEmojiText] = useState('')
   const [showForward, setShowForward] = useState(false)
   const [forwardIdx, setForwardIdx] = useState<number | null>(null)
   const [searchVisible, setSearchVisible] = useState(false)
@@ -65,10 +64,7 @@ export default function ChatDetailPage() {
     if (char) { char.unread = 0; updateChar(char.id, { unread: 0 }) }
   }, [char?.id])
 
-  const handleInsertEmoji = useCallback((e: string) => {
-    setEmojiText(e)
-    setShowEmoji(false)
-  }, [])
+  const handleInsertEmoji = useCallback(() => { setShowEmoji(false) }, [])
 
   const handleSend = async (text: string) => {
     if (!char) return
@@ -77,16 +73,22 @@ export default function ChatDetailPage() {
 
     const time = fmtTime(new Date())
     const userMsg: Message = { role: 'user', content: text, time }
-    if (quoteRef) { userMsg.quoteRef = quoteRef; setQuoteRef(null); updateChar(char.id, { quoteRef: null }) }
-    const newMsgs = [...msgs, userMsg]
-    setMsgs(newMsgs)
+    const currentQuoteRef = quoteRef
+    if (currentQuoteRef) { userMsg.quoteRef = currentQuoteRef; setQuoteRef(null); updateChar(char.id, { quoteRef: null }) }
+
+    let freshNewMsgs: Message[] = []
+    setMsgs((prev) => {
+      freshNewMsgs = [...prev, userMsg]
+      return freshNewMsgs
+    })
     updateChar(char.id, { preview: text.substring(0, 50), time })
-    saveMessages(char.id, newMsgs)
+    saveMessages(char.id, [...msgs, userMsg])
 
     const apiMsgs: { role: string; content: string }[] = [
-      { role: 'system', content: `你是${char.persona}。\n\n对话风格：${char.style}` },
+      { role: 'system', content: `${char.persona || '你是一个有帮助的AI助手'}。\n\n对话风格：${char.style || '正常对话'}` },
     ]
-    newMsgs.slice(-20).forEach((m) => apiMsgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
+    const recent = [...msgs, userMsg].slice(-20)
+    recent.forEach((m) => apiMsgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
 
     const aiTime = fmtTime(new Date())
     const aiMsg: Message = { role: 'ai', content: '', time: aiTime }
@@ -103,18 +105,24 @@ export default function ChatDetailPage() {
     })
 
     if (full) {
-      const finalMsgs = [...newMsgs, { ...aiMsg, content: full, time: fmtTime(new Date()) }]
-      setMsgs(finalMsgs)
-      updateChar(char.id, { preview: full.substring(0, 50), time: fmtTime(new Date()) })
-      saveMessages(char.id, finalMsgs)
+      setMsgs((prev) => {
+        const final = prev.filter((m) => m.content !== '' || m.role !== 'ai')
+        const result = [...final, { ...aiMsg, content: full, time: fmtTime(new Date()) }]
+        updateChar(char.id, { preview: full.substring(0, 50), time: fmtTime(new Date()) })
+        saveMessages(char.id, result)
+        return result
+      })
     } else if (error) {
       const errMsg = error.status === 401 ? 'API Key 无效，请去设置更新'
         : error.status === 429 ? '请求太频繁，请稍候再试'
         : error.status === 404 ? '模型不可用，请检查角色配置'
         : error.status >= 500 ? '服务暂时不可用'
         : '网络连接超时，请检查网络后重试'
-      setMsgs((prev) => { const u = [...prev]; u[u.length - 1] = { ...u[u.length - 1], content: `⚠️ ${errMsg}` }; return u })
-      saveMessages(char.id, [...newMsgs, { ...aiMsg, content: `⚠️ ${errMsg}`, time: fmtTime(new Date()) }])
+      setMsgs((prev) => {
+        const errFinal = prev.map((m, i) => i === prev.length - 1 ? { ...m, content: `⚠️ ${errMsg}` } : m)
+        saveMessages(char.id, errFinal)
+        return errFinal
+      })
       toast(errMsg)
     }
   }
@@ -156,11 +164,13 @@ export default function ChatDetailPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.hash.split('?')[1] || '')
     const fwd = params.get('forward')
-    if (fwd && inputRef.current) {
-      inputRef.current.setText(decodeURIComponent(fwd))
-      // Clean URL
-      const newHash = window.location.hash.replace(/[?&]forward=[^&]*/, '').replace(/\?$/, '')
-      window.history.replaceState(null, '', newHash || window.location.pathname)
+    if (fwd) {
+      const txt = decodeURIComponent(fwd)
+      const clean = window.location.hash.replace(/[?&]forward=[^&]*/, '').replace(/\?$/, '')
+      window.history.replaceState(null, '', clean || '/')
+      // Delay to ensure InputBar ref is mounted
+      const t = setTimeout(() => { inputRef.current?.setText(txt) }, 100)
+      return () => clearTimeout(t)
     }
   }, [characterId])
 
