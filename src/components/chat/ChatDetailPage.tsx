@@ -30,7 +30,10 @@ export default function ChatDetailPage() {
   const { error, start, stop } = useStreaming()
 
   const char = chars.find((c) => c.id === characterId)
-  const [msgs, setMsgs] = useState<Message[]>([])
+  const [msgs, setMsgs] = useState<Message[]>(() => {
+    if (!characterId) return []
+    return useChatStore.getState().msgCache[characterId] || []
+  })
   const [showEmoji, setShowEmoji] = useState(false)
   const [showForward, setShowForward] = useState(false)
   const [forwardIdx, setForwardIdx] = useState<number | null>(null)
@@ -77,19 +80,15 @@ export default function ChatDetailPage() {
     const currentQuoteRef = quoteRef
     if (currentQuoteRef) { userMsg.quoteRef = currentQuoteRef; setQuoteRef(null); updateChar(char.id, { quoteRef: null }) }
 
-    let freshNewMsgs: Message[] = []
-    setMsgs((prev) => {
-      freshNewMsgs = [...prev, userMsg]
-      return freshNewMsgs
-    })
+    const newMsgs = [...msgs, userMsg]
+    setMsgs(newMsgs)
     updateChar(char.id, { preview: text.substring(0, 50), time })
-    saveMessages(char.id, [...msgs, userMsg])
+    saveMessages(char.id, newMsgs)
 
     const apiMsgs: { role: string; content: string }[] = [
       { role: 'system', content: `${char.persona || '你是一个有帮助的AI助手'}。\n\n对话风格：${char.style || '正常对话'}` },
     ]
-    const recent = [...msgs, userMsg].slice(-20)
-    recent.forEach((m) => apiMsgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
+    newMsgs.slice(-20).forEach((m) => apiMsgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }))
 
     const aiTime = fmtTime(new Date())
     const aiMsg: Message = { role: 'ai', content: '', time: aiTime }
