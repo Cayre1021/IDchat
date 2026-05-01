@@ -22,7 +22,7 @@ export default function ChatDetailPage() {
   const chars = useCharStore((s) => s.chars)
   const updateChar = useCharStore((s) => s.update)
   const apis = useApiStore((s) => s.apis)
-  const { streaming, quoteRef, setQuoteRef, getMessages, saveMessages } = useChatStore()
+  const { streaming, quoteRef, setQuoteRef, getMessages, saveMessages, setCachedMessages } = useChatStore()
   const toast = useToast((s) => s.show)
   const showConfirm = useConfirmModal((s) => s.show)
   const showCtx = useContextMenu((s) => s.show)
@@ -44,7 +44,8 @@ export default function ChatDetailPage() {
 
   useEffect(() => {
     if (!char) { navigate('/chat'); return }
-    getMessages(char.id).then(setMsgs)
+    const cached = useChatStore.getState().msgCache[char.id]
+    if (cached) { setMsgs(cached) } else { getMessages(char.id).then(setMsgs) }
     setQuoteRef(char.quoteRef || null)
   }, [char?.id])
 

@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCharStore } from '../../stores/charStore'
+import { useChatStore } from '../../stores/chatStore'
 import { useContextMenu } from '../shared/ContextMenu'
 import { useConfirmModal } from '../shared/ConfirmModal'
 import { useToast } from '../shared/Toast'
@@ -19,6 +20,13 @@ export default function ChatListPage() {
   const showConfirm = useConfirmModal((s) => s.show)
   const toast = useToast((s) => s.show)
   const [search, setSearch] = useState('')
+
+  const preloadAll = useChatStore((s) => s.preloadAll)
+
+  // Preload all messages on mount for instant chat opening
+  useEffect(() => {
+    if (chars.length > 0) preloadAll(chars.map((c) => c.id))
+  }, [chars.length])
 
   const sorted = [...chars].sort((a, b) => (a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1))
   const filtered = search ? sorted.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.preview.toLowerCase().includes(search.toLowerCase())) : sorted
