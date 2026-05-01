@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import Dexie from 'dexie'
 import Header from '../layout/Header'
 import { useApiStore } from '../../stores/apiStore'
 import { useThemeStore } from '../../stores/themeStore'
@@ -27,7 +28,7 @@ export default function SettingsPage() {
       title: '重置所有数据', desc: '将删除所有 API 配置、角色和聊天记录。此操作不可撤销。', danger: true,
       onConfirm() {
         localStorage.clear()
-        charInit(); apiInit(); setTheme('system'); themeInit()
+        new Dexie('idchat').delete().then(() => { charInit(); apiInit(); setTheme('system'); themeInit() })
         toast('已重置'); navigate('/chat')
       },
     })

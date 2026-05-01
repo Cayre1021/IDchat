@@ -7,7 +7,6 @@ import { useToast } from '../shared/Toast'
 import Header from '../layout/Header'
 import EmptyState from '../shared/EmptyState'
 import ChatRow from './ChatRow'
-import { useLongPress } from '../../hooks/useLongPress'
 import type { Character } from '../../types'
 
 export default function ChatListPage() {
@@ -46,10 +45,12 @@ export default function ChatListPage() {
       <div className="flex-1 overflow-y-auto" style={{ background: 'var(--bg)' }}>
         {chars.length === 0 ? (
           <EmptyState icon={<svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>} title="还没有对话" desc="去「角色」页面创建 AI 角色，然后在这里开始聊天" action={{ label: '创建角色', onClick: () => navigate('/characters') }} />
-        ) : filtered.map((char) => {
-          const lp = useLongPress(() => showMenu(char, 100, 200))
-          return <ChatRow key={char.id} char={char} onContextMenu={(e) => { e.preventDefault(); showMenu(char, e.clientX, e.clientY) }} longPressHandlers={lp} />
-        })}
+        ) : filtered.map((char) => (
+          <ChatRow key={char.id} char={char}
+            onContextMenu={(e) => { e.preventDefault(); showMenu(char, e.clientX, e.clientY) }}
+            onLongPress={() => showMenu(char, 100, 200)}
+          />
+        ))}
       </div>
     </>
   )

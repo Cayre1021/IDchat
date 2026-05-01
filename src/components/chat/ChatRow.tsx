@@ -1,17 +1,20 @@
 import { useNavigate } from 'react-router-dom'
+import { useLongPress } from '../../hooks/useLongPress'
 import type { Character } from '../../types'
 
 interface Props {
   char: Character
   onContextMenu: (e: React.MouseEvent) => void
-  longPressHandlers: ReturnType<typeof import('../../hooks/useLongPress').useLongPress>
+  onLongPress: () => void
 }
 
-export default function ChatRow({ char, onContextMenu, longPressHandlers }: Props) {
+export default function ChatRow({ char, onContextMenu, onLongPress }: Props) {
   const navigate = useNavigate()
+  const lp = useLongPress(onLongPress)
+
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b transition-colors active:opacity-70" style={{ background: char.pinned ? 'var(--input-bg)' : 'var(--surface)', borderColor: 'var(--divider)' }}
-      onClick={() => navigate(`/chat/${char.id}`)} onContextMenu={onContextMenu} {...longPressHandlers}
+      onClick={() => navigate(`/chat/${char.id}`)} onContextMenu={onContextMenu} {...lp}
     >
       {char.pinned && <div className="absolute top-1.5 right-2.5 text-[10px] opacity-40" style={{ color: 'var(--text-secondary)' }}>📌</div>}
       <div className="w-[52px] h-[52px] rounded-full flex items-center justify-center text-[20px] font-semibold text-white flex-shrink-0" style={{ background: char.color }}>{char.initial}</div>
