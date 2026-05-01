@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Anthropic Sans';
+  src: url('/fonts/AnthropicSans.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Serif';
+  src: url('/fonts/AnthropicSerif.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Anthropic Mono';
+  src: url('/fonts/AnthropicMono.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --header: #3a8fd4;
+  --header-text: #ffffff;
+  --text: #1a1a1a;
+  --text-secondary: #8e8e93;
+  --bubble-user: #e3f2fd;
+  --bubble-ai: #ffffff;
+  --bubble-user-text: #1a1a1a;
+  --bubble-ai-text: #1a1a1a;
+  --tab-bar: #ffffff;
+  --accent: #3a8fd4;
+  --tab-inactive: #8e8e93;
+  --divider: #e5e5ea;
+  --input-bg: #f0f2f5;
+  --card: #ffffff;
+  --online: #4cd964;
+  --danger: #e74c3c;
+  --quote-bar-bg: #f8f8fa;
+  --highlight-flash: #fff9c4;
+}
+
+body {
+  font-family: 'Anthropic Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a2e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.2px;
+}
+
+.phone-frame {
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  max-height: 932px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 3px #1a1a2e, 0 0 0 6px #2d2d44, 0 20px 60px rgba(0,0,0,0.5);
+  transition: background-color .3s, color .3s;
+}
+@media (min-width: 431px) {
+  body { padding: 20px; }
+  .phone-frame { border-radius: 32px; height: 90vh; }
+}
+
+::-webkit-scrollbar { width: 0; }
+
+.inline-code {
+  background: rgba(0,0,0,.07);
+  color: #c7254e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: .9em;
+  font-family: 'Anthropic Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  word-break: break-word;
+}
+[data-theme="dark"] .inline-code, [data-theme="midnight"] .inline-code {
+  background: rgba(255,255,255,.1);
+  color: #f48fb1;
+}
