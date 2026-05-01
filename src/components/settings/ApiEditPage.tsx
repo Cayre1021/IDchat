@@ -33,7 +33,7 @@ export default function ApiEditPage() {
     if (!key.trim()) { toast('请输入 Key'); return }
     const data = { name: name.trim(), protocol, endpoint: endpoint.trim(), key: key.trim(), defaultModel: defaultModel.trim() || 'deepseek-chat' }
     if (isEdit) { update(id!, data); toast('已更新') } else { add(data); toast('已添加') }
-    setTimeout(() => navigate('/settings/api'), 0)
+    setTimeout(() => navigate('/settings/api', { replace: true }), 0)
   }
 
   const handleDelete = () => {

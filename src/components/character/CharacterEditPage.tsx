@@ -49,7 +49,7 @@ export default function CharacterEditPage() {
   }, [dirty])
 
   const handleBack = () => {
-    if (dirty) { toast('有未保存的修改') } else { navigate('/characters') }
+    if (dirty) { toast('有未保存的修改') } else { navigate('/characters', { replace: true }) }
   }
 
   const effectiveModel = useCustomModel ? customModel.trim() : model
@@ -67,12 +67,12 @@ export default function CharacterEditPage() {
       toast('角色已创建')
     }
     setDirty(false)
-    navigate('/characters')
+    navigate('/characters', { replace: true })
   }
 
   const handleDelete = () => {
     if (!id) return
-    showConfirm({ title: '删除角色', desc: '该角色及其聊天记录将被永久删除。', danger: true, onConfirm: () => { remove(id); navigate('/characters') } })
+    showConfirm({ title: '删除角色', desc: '该角色及其聊天记录将被永久删除。', danger: true, onConfirm: () => { remove(id); navigate('/characters', { replace: true }) } })
   }
 
   return (
