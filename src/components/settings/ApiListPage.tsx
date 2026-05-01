@@ -32,7 +32,7 @@ export default function ApiListPage() {
         ) : apis.map((api) => (
           <div key={api.id} className="rounded-xl p-3.5 border" style={{ background: 'var(--surface)', borderColor: 'var(--divider)' }}>
             <div className="text-[16px] font-semibold" style={{ color: 'var(--text)' }}>{api.name}</div>
-            <div className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{api.protocol === 'openai' ? 'OpenAI 兼容' : 'Anthropic 兼容'} · {api.endpoint.substring(0, 40)}... · Key: {api.key.substring(0, 14)}...</div>
+            <div className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{api.protocol === 'openai' ? 'OpenAI 兼容' : 'Anthropic 兼容'} · 模型: {api.defaultModel || '未设置'} · {api.endpoint.substring(0, 30)}... · Key: {api.key.substring(0, 14)}...</div>
             <div className="flex gap-2 mt-2.5">
               <button onClick={() => navigate(`/settings/api/${api.id}/edit`)} className="px-3.5 py-1.5 rounded-lg text-[13px] active:opacity-70" style={{ background: 'var(--input-bg)', color: 'var(--text)' }}>编辑</button>
               <button onClick={() => handleDelete(api.id)} className="px-3.5 py-1.5 rounded-lg text-[13px] active:opacity-70" style={{ background: '#fde8e8', color: 'var(--danger)' }}>删除</button>

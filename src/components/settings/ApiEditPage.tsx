@@ -20,6 +20,7 @@ export default function ApiEditPage() {
   const [protocol, setProtocol] = useState<'openai' | 'anthropic'>(existing?.protocol ?? 'openai')
   const [endpoint, setEndpoint] = useState(existing?.endpoint ?? 'https://api.deepseek.com/v1/chat/completions')
   const [key, setKey] = useState(existing?.key ?? '')
+  const [defaultModel, setDefaultModel] = useState(existing?.defaultModel ?? 'deepseek-chat')
 
   useEffect(() => {
     if (protocol === 'openai' && endpoint.includes('anthropic')) setEndpoint('https://api.deepseek.com/v1/chat/completions')
@@ -30,7 +31,7 @@ export default function ApiEditPage() {
     if (!name.trim()) { toast('请输入名称'); return }
     if (!endpoint.trim()) { toast('请输入端点'); return }
     if (!key.trim()) { toast('请输入 Key'); return }
-    const data = { name: name.trim(), protocol, endpoint: endpoint.trim(), key: key.trim() }
+    const data = { name: name.trim(), protocol, endpoint: endpoint.trim(), key: key.trim(), defaultModel: defaultModel.trim() || 'deepseek-chat' }
     if (isEdit) { update(id!, data); toast('已更新') } else { add(data); toast('已添加') }
     navigate('/settings/api')
   }
@@ -54,6 +55,7 @@ export default function ApiEditPage() {
           </select>
         </FG>
         <FG label="端点 URL"><input value={endpoint} onChange={(e) => setEndpoint(e.target.value)} className="w-full rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)]" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }} /></FG>
+        <FG label="默认模型" hint="例：deepseek-chat、gpt-4o、claude-sonnet-4-6"><input value={defaultModel} onChange={(e) => setDefaultModel(e.target.value)} placeholder="输入模型名称" className="w-full rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)]" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }} /></FG>
         <FG label="API Key" hint="密钥仅存储在浏览器本地"><input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="sk-..." className="w-full rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)]" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }} /></FG>
         <button onClick={handleSave} className="rounded-[10px] py-3.5 text-[16px] font-semibold text-white active:opacity-80" style={{ background: 'var(--accent)' }}>保存配置</button>
         {isEdit && <button onClick={handleDelete} className="rounded-[10px] py-3 text-[15px] font-medium border active:bg-red-50" style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>删除配置</button>}

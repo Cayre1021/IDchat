@@ -20,14 +20,27 @@ export default function CharacterEditPage() {
   const existing = chars.find((c) => c.id === id)
   const [name, setName] = useState(existing?.name ?? '')
   const [color, setColor] = useState(existing?.color ?? randomColor())
-  const [model, setModel] = useState(existing?.model ?? '')
+  const [model, setModel] = useState(existing?.model ?? (() => {
+    const boundApi = apis.find(a => a.id === (existing?.apiId || (apis.length > 0 ? apis[0].id : '')))
+    return existing?.model || boundApi?.defaultModel || ''
+  })())
   const [apiId, setApiId] = useState(existing?.apiId ?? (apis.length > 0 ? apis[0].id : ''))
+  const [customModel, setCustomModel] = useState('')
+  const [useCustomModel, setUseCustomModel] = useState(!MODELS.find(m => m.value === (existing?.model ?? '')) && !!existing?.model)
   const [persona, setPersona] = useState(existing?.persona ?? '')
   const [style, setStyle] = useState(existing?.style ?? '')
   const [multimodal, setMultimodal] = useState(existing?.multimodal ?? false)
   const [dirty, setDirty] = useState(false)
 
   const markDirty = () => { if (!dirty) setDirty(true) }
+
+  // Auto-fill model from API when API binding changes
+  useEffect(() => {
+    if (!isEdit && apiId && !model && !useCustomModel) {
+      const boundApi = apis.find(a => a.id === apiId)
+      if (boundApi?.defaultModel) setModel(boundApi.defaultModel)
+    }
+  }, [apiId])
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => { if (dirty) { e.preventDefault(); e.returnValue = '' } }
@@ -39,16 +52,18 @@ export default function CharacterEditPage() {
     if (dirty) { toast('有未保存的修改') } else { navigate('/characters') }
   }
 
+  const effectiveModel = useCustomModel ? customModel.trim() : model
+
   const handleSave = () => {
     if (!name.trim()) { toast('请输入名字'); return }
-    if (!model) { toast('请选择模型'); return }
+    if (!effectiveModel) { toast('请选择或输入模型名称'); return }
     if (!apiId) { toast('请绑定 API'); return }
     const initial = getInitial(name.trim())
     if (isEdit && existing) {
-      update(existing.id, { name: name.trim(), color, model, apiId, persona: persona.trim(), style: style.trim(), multimodal, initial })
+      update(existing.id, { name: name.trim(), color, model: effectiveModel, apiId, persona: persona.trim(), style: style.trim(), multimodal, initial })
       toast('角色已更新')
     } else {
-      add({ id: genId('c'), name: name.trim(), initial, color, preview: '', time: '', unread: 0, model, apiId, persona: persona.trim(), style: style.trim(), multimodal, pinned: false, messages: [], quoteRef: null })
+      add({ id: genId('c'), name: name.trim(), initial, color, preview: '', time: '', unread: 0, model: effectiveModel, apiId, persona: persona.trim(), style: style.trim(), multimodal, pinned: false, messages: [], quoteRef: null })
       toast('角色已创建')
     }
     setDirty(false)
@@ -82,11 +97,21 @@ export default function CharacterEditPage() {
           </select>
         </FG>
 
-        <FG label="模型">
-          <select value={model} onChange={(e) => { setModel(e.target.value); markDirty() }} className="w-full rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)] cursor-pointer appearance-none" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }}>
-            <option value="">选择模型...</option>
-            {MODELS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-          </select>
+        <FG label="模型" hint={useCustomModel ? '输入你的 API 支持的模型名称' : '选择预设或自定义'}>
+          {!useCustomModel ? (
+            <div className="flex gap-2">
+              <select value={model} onChange={(e) => { const v = e.target.value; if (v === '__custom__') { setUseCustomModel(true); setCustomModel(''); markDirty() } else { setModel(v); markDirty() } }} className="flex-1 rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)] cursor-pointer appearance-none" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }}>
+                <option value="">选择模型...</option>
+                {MODELS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                <option value="__custom__">自定义模型名称...</option>
+              </select>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input value={customModel} onChange={(e) => { setCustomModel(e.target.value); markDirty() }} placeholder="输入模型名称，如 deepseek-v3-0324" className="flex-1 rounded-[10px] border px-3.5 py-3 text-[15px] outline-none transition-colors focus:border-[var(--accent)]" style={{ background: 'var(--card)', borderColor: 'var(--divider)', color: 'var(--text)' }} />
+              <button onClick={() => { setUseCustomModel(false); setModel(''); markDirty() }} className="px-3 py-2 rounded-[10px] border-none cursor-pointer text-[13px] active:opacity-70" style={{ background: 'var(--input-bg)', color: 'var(--text-secondary)' }}>↩</button>
+            </div>
+          )}
         </FG>
 
         <FG label="角色设定 — TA 是谁" hint="定义角色的身份和能力。AI 每次对话都会读取。">

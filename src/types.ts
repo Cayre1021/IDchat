@@ -4,6 +4,7 @@ export interface ApiConfig {
   protocol: 'openai' | 'anthropic'
   endpoint: string
   key: string
+  defaultModel: string
 }
 
 export interface Message {
