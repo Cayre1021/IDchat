@@ -6,7 +6,8 @@ export function useLongPress(callback: () => void, ms = 500) {
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     moved.current = false
-    timer.current = setTimeout(() => { if (!moved.current) { e.preventDefault(); callback() } }, ms)
+    e.preventDefault() // Immediately block browser text selection
+    timer.current = setTimeout(() => { if (!moved.current) callback() }, ms)
   }, [callback, ms])
 
   const onTouchMove = useCallback(() => { moved.current = true; clearTimeout(timer.current) }, [])

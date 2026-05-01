@@ -13,7 +13,7 @@ export default function ChatRow({ char, onContextMenu, onLongPress }: Props) {
   const lp = useLongPress(onLongPress)
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b transition-colors active:opacity-70" style={{ background: char.pinned ? 'var(--input-bg)' : 'var(--surface)', borderColor: 'var(--divider)' }}
+    <div className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b transition-colors active:opacity-70 select-none" style={{ background: char.pinned ? 'var(--input-bg)' : 'var(--surface)', borderColor: 'var(--divider)' }}
       onClick={() => navigate(`/chat/${char.id}`)} onContextMenu={onContextMenu} {...lp}
     >
       {char.pinned && <div className="absolute top-1.5 right-2.5 text-[10px] opacity-40" style={{ color: 'var(--text-secondary)' }}>📌</div>}

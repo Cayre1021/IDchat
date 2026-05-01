@@ -31,7 +31,7 @@ export default function MessageBubble({
           style={{ background: charColor }}>{charInitial}</div>
       )}
       <div>
-        <div className={`px-[13px] py-[9px] rounded-[18px] text-[15px] leading-relaxed break-words cursor-pointer ${isUser ? 'rounded-br-[6px]' : 'rounded-bl-[6px] shadow-sm'}`}
+        <div className={`px-[13px] py-[9px] rounded-[18px] text-[15px] leading-relaxed break-words cursor-pointer select-none ${isUser ? 'rounded-br-[6px]' : 'rounded-bl-[6px] shadow-sm'}`}
           style={{ background: isUser ? 'var(--bubble-user)' : 'var(--bubble-ai)', color: isUser ? 'var(--bubble-user-text)' : 'var(--bubble-ai-text)' }}
         >
           {quotedMsg && (

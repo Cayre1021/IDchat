@@ -10,7 +10,7 @@ interface Props {
 export default function CharacterCard({ char, apiName, onContextMenu }: Props) {
   const navigate = useNavigate()
   return (
-    <div className="rounded-xl p-3.5 mb-2.5 flex items-center gap-3 cursor-pointer border relative active:scale-[0.98] transition-transform" style={{ background: 'var(--surface)', borderColor: 'var(--divider)' }}
+    <div className="rounded-xl p-3.5 mb-2.5 flex items-center gap-3 cursor-pointer border relative active:scale-[0.98] transition-transform select-none" style={{ background: 'var(--surface)', borderColor: 'var(--divider)' }}
       onClick={() => navigate(`/chat/${char.id}`)} onContextMenu={onContextMenu}
     >
       <div className="w-12 h-12 rounded-full flex items-center justify-center text-[20px] font-semibold text-white flex-shrink-0" style={{ background: char.color }}>{char.initial}</div>

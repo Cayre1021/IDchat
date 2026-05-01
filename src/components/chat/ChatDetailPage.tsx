@@ -104,26 +104,29 @@ export default function ChatDetailPage() {
       scrollToBottom()
     })
 
-    if (full) {
+    if (full || error) {
       setMsgs((prev) => {
-        const final = prev.filter((m) => m.content !== '' || m.role !== 'ai')
-        const result = [...final, { ...aiMsg, content: full, time: fmtTime(new Date()) }]
-        updateChar(char.id, { preview: full.substring(0, 50), time: fmtTime(new Date()) })
-        saveMessages(char.id, result)
-        return result
+        const updated = [...prev]
+        const lastIdx = updated.length - 1
+        if (updated[lastIdx]?.role === 'ai') {
+          let finalContent: string
+          if (full) {
+            finalContent = full
+          } else {
+            const err = error!
+            finalContent = '⚠️ ' + (err.status === 401 ? 'API Key 无效，请去设置更新'
+              : err.status === 429 ? '请求太频繁，请稍候再试'
+              : err.status === 404 ? '模型不可用，请检查角色配置'
+              : err.status >= 500 ? '服务暂时不可用'
+              : '网络连接超时，请检查网络后重试')
+          }
+          updated[lastIdx] = { ...updated[lastIdx], content: finalContent, time: fmtTime(new Date()) }
+        }
+        if (full) updateChar(char.id, { preview: full.substring(0, 50), time: fmtTime(new Date()) })
+        else if (error) toast(updated[updated.length - 1].content.replace('⚠️ ', ''))
+        saveMessages(char.id, updated)
+        return updated
       })
-    } else if (error) {
-      const errMsg = error.status === 401 ? 'API Key 无效，请去设置更新'
-        : error.status === 429 ? '请求太频繁，请稍候再试'
-        : error.status === 404 ? '模型不可用，请检查角色配置'
-        : error.status >= 500 ? '服务暂时不可用'
-        : '网络连接超时，请检查网络后重试'
-      setMsgs((prev) => {
-        const errFinal = prev.map((m, i) => i === prev.length - 1 ? { ...m, content: `⚠️ ${errMsg}` } : m)
-        saveMessages(char.id, errFinal)
-        return errFinal
-      })
-      toast(errMsg)
     }
   }
 
@@ -140,15 +143,15 @@ export default function ChatDetailPage() {
     showConfirm({
       title: '删除消息', desc: '确定要删除这条消息吗？',
       onConfirm: () => {
-        const newMsgs = msgs.filter((_, i) => i !== idx)
-        if (quoteRef?.idx === idx) { setQuoteRef(null); updateChar(char?.id || '', { quoteRef: null }) }
-        else if (quoteRef && quoteRef.idx > idx) {
-          const nr = { ...quoteRef, idx: quoteRef.idx - 1 }; setQuoteRef(nr); updateChar(char?.id || '', { quoteRef: nr })
-        }
-        newMsgs.forEach((m) => { if (m.quoteRef?.idx === idx) m.quoteRef = null; else if (m.quoteRef && m.quoteRef.idx > idx) m.quoteRef.idx-- })
-        setMsgs(newMsgs)
-        updateChar(char?.id || '', { preview: newMsgs.length ? newMsgs[newMsgs.length - 1].content.substring(0, 50) : '' })
-        saveMessages(char?.id || '', newMsgs)
+        setMsgs((prev) => {
+          const filtered = prev.filter((_, i) => i !== idx)
+          if (quoteRef?.idx === idx) setQuoteRef(null)
+          else if (quoteRef && quoteRef.idx > idx) setQuoteRef({ ...quoteRef, idx: quoteRef.idx - 1 })
+          filtered.forEach((m) => { if (m.quoteRef?.idx === idx) m.quoteRef = null; else if (m.quoteRef && m.quoteRef.idx > idx) m.quoteRef.idx-- })
+          updateChar(char?.id || '', { preview: filtered.length ? filtered[filtered.length - 1].content.substring(0, 50) : '' })
+          saveMessages(char?.id || '', filtered)
+          return filtered
+        })
       },
     })
   }
