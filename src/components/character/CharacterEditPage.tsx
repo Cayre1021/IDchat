@@ -36,9 +36,17 @@ export default function CharacterEditPage() {
 
   // Auto-fill model from API when API binding changes
   useEffect(() => {
-    if (!isEdit && apiId && !model && !useCustomModel) {
-      const boundApi = apis.find(a => a.id === apiId)
-      if (boundApi?.defaultModel) setModel(boundApi.defaultModel)
+    if (!apiId) return
+    const boundApi = apis.find(a => a.id === apiId)
+    if (boundApi?.defaultModel) {
+      const isPreset = MODELS.find(m => m.value === boundApi.defaultModel)
+      if (isPreset) {
+        setModel(boundApi.defaultModel)
+        setUseCustomModel(false)
+      } else {
+        setCustomModel(boundApi.defaultModel)
+        setUseCustomModel(true)
+      }
     }
   }, [apiId])
 
